@@ -27,6 +27,9 @@ interface ITreasury is IUUPS, IOwnable {
     /// @notice Emitted when the grace period is updated
     event GracePeriodUpdated(uint256 prevGracePeriod, uint256 newGracePeriod);
 
+    /// @dev Emitted each time the multisend address is set.
+    event MultisendSet(address indexed multisend);
+
     ///                                                          ///
     ///                            ERRORS                        ///
     ///                                                          ///

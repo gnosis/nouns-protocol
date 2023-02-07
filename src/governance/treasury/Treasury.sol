@@ -11,6 +11,7 @@ import { ITreasury } from "./ITreasury.sol";
 import { ProposalHasher } from "../governor/ProposalHasher.sol";
 import { IManager } from "../../manager/IManager.sol";
 import { VersionedContract } from "../../VersionedContract.sol";
+import { MultisendEncoder } from "./MultisendEncoder.sol";
 
 /// @title Treasury
 /// @author Rohan Kulkarni
@@ -150,16 +151,15 @@ contract Treasury is ITreasury, VersionedContract, UUPS, Ownable, ProposalHasher
         // Cache the number of targets
         uint256 numTargets = _targets.length;
 
-        // Cannot realistically overflow
-        unchecked {
-            // For each target:
-            for (uint256 i = 0; i < numTargets; ++i) {
-                // Execute the transaction
-                (bool success, ) = _targets[i].call{ value: _values[i] }(_calldatas[i]);
-
-                // Ensure the transaction succeeded
-                if (!success) revert EXECUTION_FAILED(i);
-            }
+        (address to, uint256 value, bytes memory data, Enum.Operation operation) = MultisendEncoder.encodeMultisend(
+            multisend,
+            targets,
+            values,
+            calldatas
+        );
+        bool success = IAvatar(target).execTransactionFromModule(to, value, data, operation);
+        if (!success) {
+            revert TransactionsFailed();
         }
 
         emit TransactionExecuted(proposalId, _targets, _values, _calldatas);
@@ -221,6 +221,18 @@ contract Treasury is ITreasury, VersionedContract, UUPS, Ownable, ProposalHasher
 
         // Update the grace period
         settings.gracePeriod = SafeCast.toUint128(_newGracePeriod);
+    }
+
+    /// @dev Sets the address of the multisend contract to be used for batched of transactions.
+    /// @param _multisend Address of the multisend contract to be used.
+    /// @notice Can only be called by `owner`.
+    function setMultisend(address _multisend) external {
+        // Ensure the caller is the treasury itself
+        if (msg.sender != address(this)) revert ONLY_TREASURY();
+
+        emit MultisendSet(_multisend);
+
+        multisend = _multisend;
     }
 
     ///                                                          ///
