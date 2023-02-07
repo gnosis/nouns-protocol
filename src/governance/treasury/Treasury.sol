@@ -12,6 +12,7 @@ import { ProposalHasher } from "../governor/ProposalHasher.sol";
 import { IManager } from "../../manager/IManager.sol";
 import { VersionedContract } from "../../VersionedContract.sol";
 import { MultisendEncoder } from "./MultisendEncoder.sol";
+import { IAvatar } from "@gnosis.pm/zodiac/contracts/interfaces/IAvatar.sol";
 
 /// @title Treasury
 /// @author Rohan Kulkarni
