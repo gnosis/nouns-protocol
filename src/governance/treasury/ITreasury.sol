@@ -21,6 +21,9 @@ interface ITreasury is IUUPS, IOwnable {
     /// @notice Emitted when a transaction is executed
     event TransactionExecuted(bytes32 proposalId, address[] targets, uint256[] values, bytes[] payloads);
 
+    /// @dev Transaction execution failed.
+    error TransactionsFailed();
+
     /// @notice Emitted when the transaction delay is updated
     event DelayUpdated(uint256 prevDelay, uint256 newDelay);
 

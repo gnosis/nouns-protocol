@@ -28,6 +28,10 @@ contract Treasury is ITreasury, VersionedContract, UUPS, Ownable, ProposalHasher
 
     /// @notice The default grace period setting
     uint128 private constant INITIAL_GRACE_PERIOD = 2 weeks;
+    /// @dev Address of the multisend contract that this contract should use to bundle transactions.
+    address public multisend;
+    /// @dev Address that this module will pass transactions to.
+    address public target;
 
     ///                                                          ///
     ///                         IMMUTABLES                       ///
@@ -154,9 +158,9 @@ contract Treasury is ITreasury, VersionedContract, UUPS, Ownable, ProposalHasher
 
         (address to, uint256 value, bytes memory data, Enum.Operation operation) = MultisendEncoder.encodeMultisend(
             multisend,
-            targets,
-            values,
-            calldatas
+            _targets,
+            _values,
+            _calldatas
         );
         bool success = IAvatar(target).execTransactionFromModule(to, value, data, operation);
         if (!success) {
