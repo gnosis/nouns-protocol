@@ -13,6 +13,7 @@ import { IManager } from "../../manager/IManager.sol";
 import { VersionedContract } from "../../VersionedContract.sol";
 import { MultisendEncoder } from "./MultisendEncoder.sol";
 import { IAvatar } from "@gnosis.pm/zodiac/contracts/interfaces/IAvatar.sol";
+import { Enum } from "@gnosis.pm/safe-contracts/contracts/common/Enum.sol";
 
 /// @title Treasury
 /// @author Rohan Kulkarni
@@ -154,7 +155,7 @@ contract Treasury is ITreasury, VersionedContract, UUPS, Ownable, ProposalHasher
         delete timestamps[proposalId];
 
         // Cache the number of targets
-        uint256 numTargets = _targets.length;
+        //uint256 numTargets = _targets.length;
 
         (address to, uint256 value, bytes memory data, Enum.Operation operation) = MultisendEncoder.encodeMultisend(
             multisend,
