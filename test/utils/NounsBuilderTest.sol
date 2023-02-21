@@ -16,6 +16,8 @@ import { ERC1967Proxy } from "../../src/lib/proxy/ERC1967Proxy.sol";
 import { MockERC721 } from "../utils/mocks/MockERC721.sol";
 import { MockERC1155 } from "../utils/mocks/MockERC1155.sol";
 import { WETH } from ".././utils/mocks/WETH.sol";
+import { MockAvatar } from ".././utils/mocks/MockAvatar.sol";
+import { MultiSend } from ".././utils/mocks/MultiSend.sol";
 
 contract NounsBuilderTest is Test {
     ///                                                          ///
@@ -40,12 +42,16 @@ contract NounsBuilderTest is Test {
 
     MockERC721 internal mock721;
     MockERC1155 internal mock1155;
+    MockAvatar internal mockAvatar;
+    MultiSend internal multiSend;
 
     function setUp() public virtual {
         weth = address(new WETH());
 
         mock721 = new MockERC721();
         mock1155 = new MockERC1155();
+        mockAvatar = new MockAvatar();
+        multiSend = new MultiSend();
 
         nounsDAO = vm.addr(0xA11CE);
         zoraDAO = vm.addr(0xB0B);

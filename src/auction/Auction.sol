@@ -288,7 +288,7 @@ contract Auction is IAuction, VersionedContract, UUPS, Ownable, ReentrancyGuard,
     }
 
     /// @notice Pauses the auction house
-    function pause() external onlyOwner {
+    function pause() external {
         _pause();
     }
 

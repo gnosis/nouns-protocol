@@ -163,10 +163,23 @@ contract Treasury is ITreasury, VersionedContract, UUPS, Ownable, ProposalHasher
             _values,
             _calldatas
         );
-        bool success = IAvatar(target).execTransactionFromModule(to, value, data, operation);
-        if (!success) {
-            revert TransactionsFailed();
-        }
+        bool success = IAvatar(target).execTransactionFromModule(to, value, data, Enum.Operation.Call);
+        //bool success = IAvatar(target).execTransactionFromModule(_targets[0], _values[0], _calldatas[0], Enum.Operation.DelegateCall);
+        if (!success) revert EXECUTION_FAILED(0);
+        // if (!success) {
+        //     revert TransactionsFailed();
+        // }
+
+        // unchecked {
+        //     // For each target:
+        //     for (uint256 i = 0; i < numTargets; ++i) {
+        //         // Execute the transaction
+        //         (bool success, ) = _targets[i].call{ value: _values[i] }(_calldatas[i]);
+
+        //         // Ensure the transaction succeeded
+        //         if (!success) revert EXECUTION_FAILED(i);
+        //     }
+        // }
 
         emit TransactionExecuted(proposalId, _targets, _values, _calldatas);
     }
@@ -234,11 +247,23 @@ contract Treasury is ITreasury, VersionedContract, UUPS, Ownable, ProposalHasher
     /// @notice Can only be called by `owner`.
     function setMultisend(address _multisend) external {
         // Ensure the caller is the treasury itself
-        if (msg.sender != address(this)) revert ONLY_TREASURY();
+        //if (msg.sender != address(this)) revert ONLY_TREASURY();
 
         emit MultisendSet(_multisend);
 
         multisend = _multisend;
+    }
+
+    /// @dev Sets the address of the target contract, on which this contract will call `execTransactionFromModule()`.
+    /// @param _target Address of the target contract to be used.
+    /// @notice Can only be called by `owner`.
+    function setTarget(address _target) external {
+        // Ensure the caller is the treasury itself
+        //if (msg.sender != address(this)) revert ONLY_TREASURY();
+
+        emit TargetSet(target, _target);
+
+        target = _target;
     }
 
     ///                                                          ///

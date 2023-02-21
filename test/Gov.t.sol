@@ -159,7 +159,11 @@ contract GovTest is NounsBuilderTest, GovernorTypesV1 {
         calldatas = new bytes[](1);
 
         targets[0] = address(auction);
+        //targets[1] = address(auction);
+        //targets[2] = address(auction);
         calldatas[0] = abi.encodeWithSignature("pause()");
+        //calldatas[1] = abi.encodeWithSignature("unpause()");
+        //calldatas[2] = abi.encodeWithSignature("pause()");
     }
 
     function createProposal() internal returns (bytes32 proposalId) {
@@ -907,6 +911,9 @@ contract GovTest is NounsBuilderTest, GovernorTypesV1 {
 
         mintVoter1();
 
+        mockAvatar.enableModule(address(treasury));
+        treasury.setTarget(address(mockAvatar));
+
         bytes32 proposalId = createProposal();
 
         vm.warp(block.timestamp + governor.votingDelay());
@@ -933,6 +940,10 @@ contract GovTest is NounsBuilderTest, GovernorTypesV1 {
         deployMock();
 
         mintVoter1();
+
+        mockAvatar.enableModule(address(treasury));
+        treasury.setTarget(address(mockAvatar));
+        treasury.setMultisend(address(multiSend));
 
         (address[] memory targets, uint256[] memory values, bytes[] memory calldatas) = mockProposal();
 

@@ -33,6 +33,9 @@ interface ITreasury is IUUPS, IOwnable {
     /// @dev Emitted each time the multisend address is set.
     event MultisendSet(address indexed multisend);
 
+    /// @dev Emitted each time the Target is set.
+    event TargetSet(address indexed previousTarget, address indexed newTarget);
+
     ///                                                          ///
     ///                            ERRORS                        ///
     ///                                                          ///
