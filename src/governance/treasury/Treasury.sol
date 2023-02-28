@@ -245,7 +245,7 @@ contract Treasury is ITreasury, VersionedContract, UUPS, Ownable, ProposalHasher
     /// @dev Sets the address of the multisend contract to be used for batched of transactions.
     /// @param _multisend Address of the multisend contract to be used.
     /// @notice Can only be called by `owner`.
-    function setMultisend(address _multisend) external {
+    function setMultisend(address _multisend) external onlyOwner {
         // Ensure the caller is the treasury itself
         //if (msg.sender != address(this)) revert ONLY_TREASURY();
 
@@ -257,7 +257,7 @@ contract Treasury is ITreasury, VersionedContract, UUPS, Ownable, ProposalHasher
     /// @dev Sets the address of the target contract, on which this contract will call `execTransactionFromModule()`.
     /// @param _target Address of the target contract to be used.
     /// @notice Can only be called by `owner`.
-    function setTarget(address _target) external {
+    function setTarget(address _target) external onlyOwner {
         // Ensure the caller is the treasury itself
         //if (msg.sender != address(this)) revert ONLY_TREASURY();
 
