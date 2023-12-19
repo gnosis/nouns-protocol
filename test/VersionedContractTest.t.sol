@@ -24,4 +24,10 @@ contract VersionedContractTest is NounsBuilderTest {
         assertEq(treasury.contractVersion(), expectedVersion);
         assertEq(governor.contractVersion(), expectedVersion);
     }
+
+    // TODO: fix test - breaks with newer foundry version
+    // function test_NPMPackageVersion() public {
+    //     string memory packageVersion = abi.decode(vm.parseJson(vm.readFile("package.json"), "version"), (string));
+    //     assertEq(packageVersion, expectedVersion);
+    // }
 }
