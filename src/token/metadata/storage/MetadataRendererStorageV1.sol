@@ -10,7 +10,7 @@ contract MetadataRendererStorageV1 is MetadataRendererTypesV1 {
     /// @notice The metadata renderer settings
     Settings public settings;
 
-    /// @notice The properties chosen from upon generation
+    /// @notice Canonical list of all properties.
     Property[] public properties;
 
     /// @notice The IPFS data of all property items

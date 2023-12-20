@@ -14,6 +14,7 @@ import { ERC721 } from "../../lib/token/ERC721.sol";
 
 import { MetadataRendererStorageV1 } from "./storage/MetadataRendererStorageV1.sol";
 import { MetadataRendererStorageV2 } from "./storage/MetadataRendererStorageV2.sol";
+import { MetadataRendererStorageV3 } from "./storage/MetadataRendererStorageV3.sol";
 import { IToken } from "../../token/IToken.sol";
 import { IPropertyIPFSMetadataRenderer } from "./interfaces/IPropertyIPFSMetadataRenderer.sol";
 import { IManager } from "../../manager/IManager.sol";
@@ -22,14 +23,15 @@ import { VersionedContract } from "../../VersionedContract.sol";
 /// @title Metadata Renderer
 /// @author Iain Nash & Rohan Kulkarni
 /// @notice A DAO's artwork generator and renderer
-/// @custom:repo github.com/ourzora/nouns-protocol 
+/// @custom:repo github.com/ourzora/nouns-protocol
 contract MetadataRenderer is
     IPropertyIPFSMetadataRenderer,
     VersionedContract,
     Initializable,
     UUPS,
     MetadataRendererStorageV1,
-    MetadataRendererStorageV2
+    MetadataRendererStorageV2,
+    MetadataRendererStorageV3
 {
     ///                                                          ///
     ///                          IMMUTABLES                      ///
@@ -126,11 +128,7 @@ contract MetadataRenderer is
     /// @param _names The names of the properties to add
     /// @param _items The items to add to each property
     /// @param _ipfsGroup The IPFS base URI and extension
-    function addProperties(
-        string[] calldata _names,
-        ItemParam[] calldata _items,
-        IPFSGroup calldata _ipfsGroup
-    ) external onlyOwner {
+    function addProperties(string[] calldata _names, ItemParam[] calldata _items, IPFSGroup calldata _ipfsGroup) external onlyOwner {
         _addProperties(_names, _items, _ipfsGroup);
     }
 
@@ -139,21 +137,13 @@ contract MetadataRenderer is
     /// @param _names The names of the properties to add
     /// @param _items The items to add to each property
     /// @param _ipfsGroup The IPFS base URI and extension
-    function deleteAndRecreateProperties(
-        string[] calldata _names,
-        ItemParam[] calldata _items,
-        IPFSGroup calldata _ipfsGroup
-    ) external onlyOwner {
+    function deleteAndRecreateProperties(string[] calldata _names, ItemParam[] calldata _items, IPFSGroup calldata _ipfsGroup) external onlyOwner {
         delete ipfsData;
         delete properties;
         _addProperties(_names, _items, _ipfsGroup);
     }
 
-    function _addProperties(
-        string[] calldata _names,
-        ItemParam[] calldata _items,
-        IPFSGroup calldata _ipfsGroup
-    ) internal {
+    function _addProperties(string[] calldata _names, ItemParam[] calldata _items, IPFSGroup calldata _ipfsGroup) internal {
         // Cache the existing amount of IPFS data stored
         uint256 dataLength = ipfsData.length;
 
@@ -229,6 +219,12 @@ contract MetadataRenderer is
                 // Store the new item's name and reference slot
                 newItem.name = _items[i].name;
                 newItem.referenceSlot = uint16(dataLength);
+
+                // Store the item IDs in `availableItems`.
+                uint256 propertyId = _items[i].propertyId;
+                availableItems[propertyId].push();
+                uint256 numberOfAllowedItems = availableItems[propertyId].length;
+                availableItems[propertyId][numberOfAllowedItems - 1] = newItemIndex;
             }
         }
     }
@@ -263,10 +259,11 @@ contract MetadataRenderer is
             // For each property:
             for (uint256 i = 0; i < numProperties; ++i) {
                 // Get the number of items to choose from
-                uint256 numItems = properties[i].items.length;
+                uint256 numItems = availableItems[i].length;
 
                 // Use the token's seed to select an item
-                tokenAttributes[i + 1] = uint16(seed % numItems);
+                uint256 selection = seed % numItems;
+                tokenAttributes[i + 1] = uint16(availableItems[i][selection]);
 
                 // Adjust the randomness
                 seed >>= 16;
