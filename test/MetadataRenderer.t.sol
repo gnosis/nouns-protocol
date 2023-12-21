@@ -145,6 +145,36 @@ contract MetadataRendererTest is NounsBuilderTest, MetadataRendererTypesV1 {
         assertTrue(response);
     }
 
+    function test_setItemAvailabilities() public {
+        string[] memory names = new string[](1);
+        names[0] = "testing";
+
+        ItemParam[] memory items = new ItemParam[](3);
+        items[0] = ItemParam({ propertyId: 0, name: "failure1", isNewProperty: true });
+        items[1] = ItemParam({ propertyId: 0, name: "failure2", isNewProperty: true });
+        items[2] = ItemParam({ propertyId: 0, name: "failure3", isNewProperty: true });
+
+        IPFSGroup memory ipfsGroup = IPFSGroup({ baseUri: "BASE_URI", extension: "EXTENSION" });
+
+        vm.prank(founder);
+        metadataRenderer.addProperties(names, items, ipfsGroup);
+        uint256[] memory availableItems = metadataRenderer.getAvailableItems(0);
+        assertEq(availableItems.length, 3);
+        assertEq(availableItems[0], 0);
+        assertEq(availableItems[1], 1);
+        assertEq(availableItems[2], 2);
+
+        uint256 propertyId = 0;
+        uint256[] memory itemIds = new uint256[](1);
+        itemIds[0] = 1;
+
+        vm.prank(founder);
+        metadataRenderer.setItemAvailabilities(propertyId, itemIds);
+        availableItems = metadataRenderer.getAvailableItems(0);
+        assertEq(availableItems.length, 1);
+        assertEq(availableItems[0], 1);
+    }
+
     function test_ContractURI() public {
         /**
             base64 -d

@@ -229,6 +229,30 @@ contract MetadataRenderer is
         }
     }
 
+    function setItemAvailabilities(uint256 propertyId, uint256[] memory itemIds) public onlyOwner {
+        uint256 numberOfItems = properties[propertyId].items.length;
+        if (numberOfItems == 0) revert INVALID_PROPERTY_SELECTED(propertyId);
+        delete availableItems[propertyId];
+        assert(availableItems[propertyId].length == 0);
+        for (uint i = 0; i < itemIds.length; i++) {
+            uint256 itemId = itemIds[i];
+            if (itemId >= numberOfItems) revert ITEM_DOES_NOT_EXIST(propertyId, itemId);
+            availableItems[propertyId].push();
+            availableItems[propertyId][i] = itemId;
+        }
+        emit ItemAvailabilitiesSet(propertyId, itemIds);
+    }
+
+    function getAvailableItems(uint256 propertyId) public view returns (uint256[] memory) {
+        uint256 numberOfItems = availableItems[propertyId].length;
+        if (numberOfItems == 0) revert INVALID_PROPERTY_SELECTED(propertyId);
+        uint256[] memory itemIds = new uint256[](numberOfItems);
+        for (uint i = 0; i < numberOfItems; i++) {
+            itemIds[i] = availableItems[propertyId][i];
+        }
+        return itemIds;
+    }
+
     ///                                                          ///
     ///                     ATTRIBUTE GENERATION                 ///
     ///                                                          ///

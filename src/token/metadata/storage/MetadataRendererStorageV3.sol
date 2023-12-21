@@ -7,5 +7,5 @@ pragma solidity 0.8.16;
 contract MetadataRendererStorageV3 {
     /// @notice The items chosen from upon generation
     /// @dev Mapping from PropertyID to array of available items.
-    mapping(uint256 => uint256[]) availableItems;
+    mapping(uint256 => uint256[]) public availableItems;
 }

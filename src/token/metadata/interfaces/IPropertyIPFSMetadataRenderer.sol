@@ -31,6 +31,9 @@ interface IPropertyIPFSMetadataRenderer is IBaseMetadata, MetadataRendererTypesV
     /// @notice Emitted when the collection uri is updated
     event WebsiteURIUpdated(string lastURI, string newURI);
 
+    /// @notice Emitted when the available items for a property are set
+    event ItemAvailabilitiesSet(uint256 propertyId, uint256[] items);
+
     ///                                                          ///
     ///                            ERRORS                        ///
     ///                                                          ///
@@ -50,6 +53,9 @@ interface IPropertyIPFSMetadataRenderer is IBaseMetadata, MetadataRendererTypesV
     ///
     error TOO_MANY_PROPERTIES();
 
+    /// @dev Reverts if an non-existant item would be made available
+    error ITEM_DOES_NOT_EXIST(uint256 propertyId, uint256 itemId);
+
     ///                                                          ///
     ///                           FUNCTIONS                      ///
     ///                                                          ///
@@ -58,11 +64,7 @@ interface IPropertyIPFSMetadataRenderer is IBaseMetadata, MetadataRendererTypesV
     /// @param names The names of the properties to add
     /// @param items The items to add to each property
     /// @param ipfsGroup The IPFS base URI and extension
-    function addProperties(
-        string[] calldata names,
-        ItemParam[] calldata items,
-        IPFSGroup calldata ipfsGroup
-    ) external;
+    function addProperties(string[] calldata names, ItemParam[] calldata items, IPFSGroup calldata ipfsGroup) external;
 
     /// @notice The number of properties
     function propertiesCount() external view returns (uint256);
@@ -95,4 +97,9 @@ interface IPropertyIPFSMetadataRenderer is IBaseMetadata, MetadataRendererTypesV
     /// @notice Updates the collection description
     /// @param newDescription The new description
     function updateDescription(string memory newDescription) external;
+
+    /// @notice Sets the list of items that are available for the given property on mint
+    /// @param propertyId Index of the property to set available traits on
+    /// @param items List of items to set as available for the given property
+    function setItemAvailabilities(uint256 propertyId, uint256[] memory items) external;
 }
